@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
-import { addUSer, getUserByEmail } from "../models/userModel.js";
-import { loginSchema, userSchema } from "../validations/userValidation.js";
+import { addUSer, getUserByEmail, getAllUsers, getUser, updateUser, deleteUser } from "../models/userModel.js";
+import { loginSchema, userSchema, updateUserSchema } from "../validations/userValidation.js";
 
 export const createUser = async (req, res) => {
     try {
@@ -70,3 +70,82 @@ export const loginUser = async (req, res) => {
         })
     }
 } 
+
+export const findUser = async (req, res) => {
+    try {
+        const showAllUser = await getAllUsers();
+        res.status(200).json(showAllUser);
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const editUser = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        const existingUser = await getUser(id);
+        if (!existingUser) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            })
+        }
+        const validatedData = updateUserSchema.parse(req.body);
+
+        if (validatedData.email && validatedData.email !== existingUser.email) {
+            const emailTaken = await getUserByEmail(validatedData.email);
+            if (emailTaken) {
+                return res.status(409).json({
+                    status: false,
+                    message: "Email already exists"
+                })
+            }
+        }
+        if (validatedData.password) {
+            validatedData.password = await bcrypt.hash(validatedData.password, 10);
+        }
+
+        const updatedUser = await updateUser(id, validatedData);
+
+        res.status(200).json({
+            status: true,
+            message: "User updated successfully",
+            data: updatedUser
+        })
+    } catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const removeUser = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        const existingUser = await getUser(id);
+        if (!existingUser) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            })
+        }
+
+        await deleteUser(id);
+
+        res.status(200).json({
+            status: true,
+            message: "User deleted successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
