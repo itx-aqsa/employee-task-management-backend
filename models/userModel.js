@@ -6,8 +6,7 @@ export const addUSer = (data) => {
         data: {
             name: data.name,
             email: data.email,
-            password: data.password,
-            role: data.role
+            password: data.password
         }
     })
 }
