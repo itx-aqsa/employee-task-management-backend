@@ -1,8 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { addUSer, getUserByEmail, getAllUsers, getUser, updateUser, deleteUser } from "../models/userModel.js";
+import { addUser, getUserByEmail, getAllEmployees, getUser, updateUser, deleteUser } from "../models/userModel.js";
 import { loginSchema, userSchema, updateUserSchema } from "../validations/userValidation.js";
-import { email } from "zod";
 
 export const createUser = async (req, res) => {
     try {
@@ -20,7 +19,7 @@ export const createUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
-        const newUser = await addUSer({...validatedData, password: hashedPassword});
+        const newUser = await addUser({...validatedData, password: hashedPassword});
 
         res.status(201).json({
             status: true,
@@ -89,10 +88,13 @@ export const loginUser = async (req, res) => {
     }
 } 
 
-export const findUser = async (req, res) => {
+export const getEmployees = async (req, res) => {
     try {
-        const showAllUser = await getAllUsers();
-        res.status(200).json(showAllUser);
+        const employees = await getAllEmployees();
+        res.status(200).json({
+            status: true,
+            data: employees
+        });
     } catch (error) {
         res.status(500).json({
             status: false,
@@ -109,7 +111,14 @@ export const editUser = async (req, res) => {
         if (!existingUser) {
             return res.status(404).json({
                 status: false,
-                message: "User not found"
+                message: "Employee not found"
+            })
+        }
+
+        if(existingUser.role !== "EMPLOYEE") {
+            return res.status(403).json({
+                status: false,
+                message: "You can only edit employee"
             })
         }
         const validatedData = updateUserSchema.parse(req.body);
@@ -131,7 +140,7 @@ export const editUser = async (req, res) => {
 
         res.status(200).json({
             status: true,
-            message: "User updated successfully",
+            message: "Employee updated successfully",
             data: updatedUser
         })
     } catch (error) {
@@ -150,15 +159,21 @@ export const removeUser = async (req, res) => {
         if (!existingUser) {
             return res.status(404).json({
                 status: false,
-                message: "User not found"
+                message: "Employee not found"
             })
         }
 
+        if(existingUser.role !== "EMPLOYEE") {
+            return res.status(403).json({
+                status: false,
+                message: "You can only delete employees"
+            })
+        }
         await deleteUser(id);
 
         res.status(200).json({
             status: true,
-            message: "User deleted successfully"
+            message: "Employee deleted successfully"
         })
     } catch (error) {
         res.status(500).json({
@@ -167,14 +182,14 @@ export const removeUser = async (req, res) => {
         })
     }
 }
-
+ 
 export const getProfile = async (req, res) => {
     try {
         const user = await getUser(req.user.id);
         if(!user) {
             return res.status(404).json({
                 status: false,
-                message: "User not found"
+                message: "Employee not found"
             })
         }
 

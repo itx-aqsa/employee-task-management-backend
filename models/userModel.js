@@ -1,12 +1,12 @@
-import { email } from "zod";
 import { prisma } from "../lib/prisma.js";
 
-export const addUSer = (data) => {
+export const addUser = (data) => {
     return prisma.user.create({
         data: {
             name: data.name,
             email: data.email,
-            password: data.password
+            password: data.password,
+            role: "EMPLOYEE"
         }
     })
 }
@@ -19,7 +19,7 @@ export const getUserByEmail = (email) => {
     })
 }
 
-export const getAllUsers = () => {
+export const getAllEmployees = () => {
     return prisma.user.findMany({
         where: {
             role: "EMPLOYEE"

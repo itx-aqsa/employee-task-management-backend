@@ -1,3 +1,4 @@
+import { email } from "zod";
 import { prisma } from "../lib/prisma.js";
 
 export const addTask = (data) => {
@@ -15,6 +16,15 @@ export const getAllTasks = () => {
     return prisma.task.findMany({
         orderBy: {
             createdAt: "desc"
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true
+                }
+            }
         }
     });
 };
