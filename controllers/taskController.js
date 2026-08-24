@@ -1,6 +1,6 @@
-import { addTask, getAllTasks, getTask, editTask, removeTask } from "../models/taskModel.js";
+import { addTask, getAllTasks, getTask, updateTask, deleteTask } from "../models/taskModel.js";
 import { getUser } from "../models/userModel.js";
-import { taskSchema } from "../validations/taskValidation.js";
+import { taskSchema, updateTaskSchema } from "../validations/taskValidation.js";
 
                                                                                                                                                                                                                                                                                                     
 export const createTask = async (req, res) => {
@@ -52,36 +52,42 @@ export const findAllTasks = async (req, res) => {
     }
 };
 
-export const findTask = async (req, res) => {
+export const editTask = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        const task = await getTask(id);
-        if (!task) {
+        const existingTask = await getTask(id);
+        if (!existingTask) {
             return res.status(404).json({
                 status: false,
                 message: "Task not found"
             });
         }
-        res.status(200).json({
-            status: true,
-            data: task
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: false,
-            message: error.message
-        });
-    }
-};
 
-export const updateTask = async (req, res) => {
-    try {
-        const id = Number(req.params.id);
+        const validatedData = updateTaskSchema.parse({
+            ...req.body, 
+            userId: req.body.userId ? Number(req.body.userId) : undefined
+        })
 
-        const data = taskSchema.parse(req.body);
+        if(validatedData.userId) {
+            const employee = await getUser(validatedData.userId);
 
-        const updatedTask = await editTask(id, data);
+            if(!employee) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Employee not found"
+                })
+            }
+
+            if(employee.role !== "EMPLOYEE") {
+                return res.status(400).json({
+                    status: false,
+                    message: "Task can only be assigned to an employee"
+                })
+            }
+        }
+
+        const updatedTask = await updateTask(id, validatedData);
         res.status(200).json({
             status: true,
             message: "Task updated successfully",
@@ -95,15 +101,22 @@ export const updateTask = async (req, res) => {
     }
 };
 
-export const deleteTask = async (req, res) => {
+export const removeTask = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        const deletedTask = await removeTask(id);
+        const existingTask = await getTask(id);
+        if (!existingTask) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            });
+        }
+
+        await deleteTask(id);
         res.status(200).json({
             status: true,
-            message: "Task deleted successfully",
-            data: deletedTask
+            message: "Task deleted successfully"
         });
     } catch (error) {
         res.status(500).json({

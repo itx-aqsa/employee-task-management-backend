@@ -37,7 +37,7 @@ export const getTask = (id) => {
     });
 };
 
-export const editTask = (id, data) => {
+export const updateTask = (id, data) => {
     return prisma.task.update({
         where: {
             id
@@ -46,13 +46,12 @@ export const editTask = (id, data) => {
             title: data.title,
             description: data.description,
             priority: data.priority,
-            status: data.status,
             userId: data.userId
         }
     });
 };
 
-export const removeTask = (id) => {
+export const deleteTask = (id) => {
     return prisma.task.delete({
         where: {
             id
