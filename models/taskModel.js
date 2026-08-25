@@ -1,4 +1,3 @@
-import { email } from "zod";
 import { prisma } from "../lib/prisma.js";
 
 export const addTask = (data) => {
@@ -66,6 +65,17 @@ export const getMyTasks = (userId) => {
         },
         orderBy: {
             createdAt: "desc"
+        }
+    })
+}
+
+export const updateTaskStatus = (id, status) => {
+    return prisma.task.update({
+        where: {
+            id
+        },
+        data: {
+            status
         }
     })
 }

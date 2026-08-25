@@ -18,3 +18,10 @@ export const updateTaskSchema = z.object({
         message: "Atleast one field must be provided to update"
     }
 )
+
+export const updateTaskStatusSchema = z.object({
+    status: z.enum(
+        ["PENDING", "IN_PROGRESS", "COMPLETED"],
+        "Invalid task status"
+    )
+})

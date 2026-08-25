@@ -1,6 +1,6 @@
-import { addTask, getAllTasks, getTask, updateTask, deleteTask, getMyTasks } from "../models/taskModel.js";
+import { addTask, getAllTasks, getTask, updateTask, deleteTask, getMyTasks, updateTaskStatus } from "../models/taskModel.js";
 import { getUser } from "../models/userModel.js";
-import { taskSchema, updateTaskSchema } from "../validations/taskValidation.js";
+import { taskSchema, updateTaskSchema, updateTaskStatusSchema } from "../validations/taskValidation.js";
 
                                                                                                                                                                                                                                                                                                     
 export const createTask = async (req, res) => {
@@ -158,6 +158,39 @@ export const findMyTasks = async(req, res) => {
         })
     } catch (error) {
         res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const changeTaskStatus = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const task = await getTask(id);
+        if(!task) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            })
+        }
+
+        if(task.userId !== req.user.id) {
+            return res.status(403).json({
+                status: false,
+                message: "You can only update your own tasks"
+            })
+        }
+
+        const validateData = updateTaskStatusSchema.parse(req.body);
+        const updatedTask = await updateTaskStatus(id, validateData.status);
+        res.status(200).json({
+            status: true,
+            message: "Task status updated successfully",
+            data: updatedTask
+        })
+    } catch (error) {
+        res.status(400).json({
             status: false,
             message: error.message
         })
