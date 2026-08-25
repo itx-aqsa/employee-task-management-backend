@@ -1,4 +1,4 @@
-import { addTask, getAllTasks, getTask, updateTask, deleteTask } from "../models/taskModel.js";
+import { addTask, getAllTasks, getTask, updateTask, deleteTask, getMyTasks } from "../models/taskModel.js";
 import { getUser } from "../models/userModel.js";
 import { taskSchema, updateTaskSchema } from "../validations/taskValidation.js";
 
@@ -146,5 +146,20 @@ export const findOneTask = async (req, res) => {
             status: false,
             message: error.message
         });
+    }
+}
+
+export const findMyTasks = async(req, res) => {
+    try {
+        const tasks = await getMyTasks(req.user.id);
+        res.status(200).json({
+            status: true,
+            data: tasks
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
     }
 }

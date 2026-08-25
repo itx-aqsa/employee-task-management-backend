@@ -58,3 +58,14 @@ export const deleteTask = (id) => {
         }
     });
 };
+
+export const getMyTasks = (userId) => {
+    return prisma.task.findMany({
+        where: {
+            userId: userId
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    })
+}
