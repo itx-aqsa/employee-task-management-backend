@@ -125,3 +125,26 @@ export const removeTask = async (req, res) => {
         });
     }
 };
+
+export const findOneTask = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        const task = await getTask(id);
+        if (!task) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            });
+        }
+        res.status(200).json({
+            status: true,
+            data: task
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        });
+    }
+}
