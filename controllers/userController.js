@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { addUser, getUserByEmail, getAllEmployees, getUser, updateUser, deleteUser } from "../models/userModel.js";
+import { addUser, getUserByEmail, getAllEmployees, getUser, updateUser, deleteUser, getDashboardStats } from "../models/userModel.js";
 import { loginSchema, userSchema, updateUserSchema } from "../validations/userValidation.js";
 
 export const createUser = async (req, res) => {
@@ -201,6 +201,21 @@ export const getProfile = async (req, res) => {
                 email: user.email,
                 role: user.role
             }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const dashboardStats = async (req, res) => {
+    try {
+        const stats = await getDashboardStats();
+        res.status(200).json({
+            status: true,
+            data: stats
         })
     } catch (error) {
         res.status(500).json({

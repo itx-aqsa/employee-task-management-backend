@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, loginUser, getEmployees, editUser, removeUser, getProfile } from "../controllers/userController.js";
+import { createUser, loginUser, getEmployees, editUser, removeUser, getProfile, dashboardStats } from "../controllers/userController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
@@ -34,5 +34,6 @@ router.get(
 
 router.put("/:id", authMiddleware, roleMiddleware("ADMIN"), editUser);
 router.delete("/:id", authMiddleware, roleMiddleware("ADMIN"), removeUser);
+router.get("/dashboard-stats", authMiddleware, roleMiddleware("ADMIN"), dashboardStats);
 
 export default router
