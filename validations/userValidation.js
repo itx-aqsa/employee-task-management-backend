@@ -14,7 +14,7 @@ export const loginSchema = z.object({
 export const updateUserSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters").optional(),
     email: z.string().email("Please enter a valid email").optional(),
-    password: z.string().min(6, "Password must be at least 6 characters").optional(),
+    password: z.string().min(6, "Password must be at least 6 characters").or(z.literal("")).optional(),
 }).refine(data => Object.keys(data).length > 0, {
     message: "At least one field must be provided to update"
 })

@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, loginUser, getEmployees, editUser, removeUser, getProfile, dashboardStats } from "../controllers/userController.js";
+import { createUser, loginUser, getEmployees, editUser, removeUser, getProfile, dashboardStats, getOneEmployee } from "../controllers/userController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
@@ -9,6 +9,8 @@ router.post("/", createUser);
 router.post("/login", loginUser);
 router.get("/employees", authMiddleware, roleMiddleware("ADMIN"), getEmployees);
 router.get("/profile", authMiddleware, getProfile);
+router.get("/dashboard-stats", authMiddleware, roleMiddleware("ADMIN"), dashboardStats);
+router.get("/id", authMiddleware, roleMiddleware("ADMIN"), getOneEmployee)
 
 router.get(
     "/admin-dashboard", authMiddleware, 
@@ -34,6 +36,5 @@ router.get(
 
 router.put("/:id", authMiddleware, roleMiddleware("ADMIN"), editUser);
 router.delete("/:id", authMiddleware, roleMiddleware("ADMIN"), removeUser);
-router.get("/dashboard-stats", authMiddleware, roleMiddleware("ADMIN"), dashboardStats);
 
 export default router

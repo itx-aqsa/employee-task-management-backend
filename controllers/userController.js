@@ -182,6 +182,41 @@ export const removeUser = async (req, res) => {
         })
     }
 }
+
+export const getOneEmployee = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const user = await getUser(id);
+        if(!user) {
+            return res.status(404).json({
+                status: false,
+                message: "Employee not found"
+            })
+        }
+
+        if(user.role !== "EMPLOYEE") {
+            return res.status(404).json({
+                status: false,
+                message: "Employee not found"
+            })
+        }
+
+        res.status(200).json({
+            status: true,
+            data: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
  
 export const getProfile = async (req, res) => {
     try {
