@@ -10,7 +10,7 @@ router.post("/login", loginUser);
 router.get("/employees", authMiddleware, roleMiddleware("ADMIN"), getEmployees);
 router.get("/profile", authMiddleware, getProfile);
 router.get("/dashboard-stats", authMiddleware, roleMiddleware("ADMIN"), dashboardStats);
-router.get("/id", authMiddleware, roleMiddleware("ADMIN"), getOneEmployee)
+router.get("/:id", authMiddleware, roleMiddleware("ADMIN"), getOneEmployee)
 
 router.get(
     "/admin-dashboard", authMiddleware, 
