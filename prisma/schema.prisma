@@ -7,7 +7,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   name      String
   email     String   @unique
   password  String
@@ -15,7 +15,7 @@ model User {
   updatedAt DateTime @updatedAt
   role      Role     @default(EMPLOYEE)
 
-   tasks     Task[]
+  tasks     Task[]
 }
 
 enum Role {
@@ -24,12 +24,12 @@ enum Role {
 }
 
 model Task {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   title  String
   description  String?
   priority  Priority  @default(MEDIUM)
   status  Status  @default(PENDING)
-  userId  Int
+  userId  String
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
