@@ -26,6 +26,11 @@ export const getAllEmployees = () => {
         },
         orderBy: {
             createdAt: "desc"
+        },
+        include: {
+            _count: {
+                select: { tasks: true }
+            }
         }
     })
 }

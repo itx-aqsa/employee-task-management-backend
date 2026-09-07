@@ -4,14 +4,14 @@ export const taskSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters"),
     description: z.string().optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
-    userId: z.number().int().positive("Invalid employee id")
+    userId: z.string().min(1, "Invalid employee id")
 });
 
 export const updateTaskSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters").optional(),
     description: z.string().optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
-    userId: z.number().int().positive("Invalid employee id").optional()
+    userId: z.string().min(1, "Invalid employee id").optional()
 }).refine(
     data => Object.keys(data).length > 0,
     {
