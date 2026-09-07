@@ -68,10 +68,16 @@ export const loginUser = async (req, res) => {
             { expiresIn: "1d" }
         )
 
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 24 * 60 * 60 * 1000 
+        })
+
         return res.status(200).json({
             status: true,
             message: "Login successful",
-            token: token,
             data: {
                 id: user.id,
                 name: user.name,
@@ -223,4 +229,52 @@ export const dashboardStats = async (req, res) => {
             message: error.message
         })
     }
+}
+
+export const getEmployeeById = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const user = await getUser(id);
+        if (!user) {
+            return res.status(404).json({
+                status: false,
+                message: "Employee not found"
+            })
+        }
+
+        if (user.role !== "EMPLOYEE") {
+            return res.status(403).json({
+                status: false,
+                message: "User is not an employee"
+            })
+        }
+
+        res.status(200).json({
+            status: true,
+            data: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        })
+    }
+}
+
+export const logoutUser = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
+    })
+
+    return res.status(200).json({
+        status: true,
+        message: "Logout successful"
+    })
 }
