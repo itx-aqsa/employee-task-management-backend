@@ -105,7 +105,7 @@ export const getEmployees = async (req, res) => {
 
 export const editUser = async (req, res) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
 
         const existingUser = await getUser(id);
         if (!existingUser) {
@@ -153,7 +153,7 @@ export const editUser = async (req, res) => {
 
 export const removeUser = async (req, res) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
 
         const existingUser = await getUser(id);
         if (!existingUser) {
@@ -185,7 +185,7 @@ export const removeUser = async (req, res) => {
 
 export const getOneEmployee = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
         const user = await getUser(id);
         if(!user) {
             return res.status(404).json({

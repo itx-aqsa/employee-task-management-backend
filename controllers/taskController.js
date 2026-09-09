@@ -65,6 +65,7 @@ export const editTask = async (req, res) => {
         }
 
         const validatedData = updateTaskSchema.parse(req.body);
+
         if(validatedData.userId) {
             const employee = await getUser(validatedData.userId);
 
@@ -100,6 +101,7 @@ export const editTask = async (req, res) => {
 export const removeTask = async (req, res) => {
     try {
         const id = req.params.id;
+
         const existingTask = await getTask(id);
         if (!existingTask) {
             return res.status(404).json({
