@@ -64,10 +64,7 @@ export const editTask = async (req, res) => {
             });
         }
 
-        const validatedData = updateTaskSchema.parse({
-            ...req.body, 
-            userId: req.body.userId ? req.body.userId : undefined
-        })
+        const validatedData = updateTaskSchema.parse(req.body);
 
         if(validatedData.userId) {
             const employee = await getUser(validatedData.userId);
