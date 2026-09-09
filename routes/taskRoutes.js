@@ -1,5 +1,5 @@
 import express from "express";
-import { createTask, findAllTasks, findTask, updateTask, deleteTask } from "../controllers/taskController.js";
+import { createTask, findAllTasks, findOneTask, editTask, removeTask } from "../controllers/taskController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.post("/", authMiddleware, roleMiddleware("ADMIN"), createTask);
 router.get("/", authMiddleware, roleMiddleware("ADMIN"), findAllTasks);
-router.get("/:id", findTask);
-router.put("/:id", updateTask);
-router.delete("/:id", deleteTask);
+router.get("/:id", authMiddleware, roleMiddleware("ADMIN"), findOneTask);
+router.put("/:id", authMiddleware, roleMiddleware("ADMIN"), editTask);
+router.delete("/:id", authMiddleware, roleMiddleware("ADMIN"), removeTask);
 
 export default router;

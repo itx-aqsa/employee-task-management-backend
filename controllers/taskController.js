@@ -1,6 +1,6 @@
-import { addTask, getAllTasks, getTask, editTask, removeTask } from "../models/taskModel.js";
+import { addTask, getAllTasks, getTask, updateTask, deleteTask } from "../models/taskModel.js";
 import { getUser } from "../models/userModel.js";
-import { taskSchema } from "../validations/taskValidation.js";
+import { taskSchema, updateTaskSchema } from "../validations/taskValidation.js";
 
                                                                                                                                                                                                                                                                                                     
 export const createTask = async (req, res) => {
@@ -52,9 +52,83 @@ export const findAllTasks = async (req, res) => {
     }
 };
 
-export const findTask = async (req, res) => {
+export const editTask = async (req, res) => {
     try {
         const id = Number(req.params.id);
+
+        const existingTask = await getTask(id);
+        if (!existingTask) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            });
+        }
+
+        const validatedData = updateTaskSchema.parse({
+            ...req.body, 
+            userId: req.body.userId ? Number(req.body.userId) : undefined
+        })
+
+        if(validatedData.userId) {
+            const employee = await getUser(validatedData.userId);
+
+            if(!employee) {
+                return res.status(404).json({
+                    status: false,
+                    message: "Employee not found"
+                })
+            }
+
+            if(employee.role !== "EMPLOYEE") {
+                return res.status(400).json({
+                    status: false,
+                    message: "Task can only be assigned to an employee"
+                })
+            }
+        }
+
+        const updatedTask = await updateTask(id, validatedData);
+        res.status(200).json({
+            status: true,
+            message: "Task updated successfully",
+            data: updatedTask
+        });
+    } catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message
+        });
+    }
+};
+
+export const removeTask = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        const existingTask = await getTask(id);
+        if (!existingTask) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            });
+        }
+
+        await deleteTask(id);
+        res.status(200).json({
+            status: true,
+            message: "Task deleted successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message
+        });
+    }
+};
+
+export const findOneTask = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
 
         const task = await getTask(id);
         if (!task) {
@@ -73,42 +147,4 @@ export const findTask = async (req, res) => {
             message: error.message
         });
     }
-};
-
-export const updateTask = async (req, res) => {
-    try {
-        const id = Number(req.params.id);
-
-        const data = taskSchema.parse(req.body);
-
-        const updatedTask = await editTask(id, data);
-        res.status(200).json({
-            status: true,
-            message: "Task updated successfully",
-            data: updatedTask
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: false,
-            message: error.message
-        });
-    }
-};
-
-export const deleteTask = async (req, res) => {
-    try {
-        const id = Number(req.params.id);
-
-        const deletedTask = await removeTask(id);
-        res.status(200).json({
-            status: true,
-            message: "Task deleted successfully",
-            data: deletedTask
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: false,
-            message: error.message
-        });
-    }
-};
+}
