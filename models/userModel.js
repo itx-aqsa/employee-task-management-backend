@@ -26,6 +26,11 @@ export const getAllEmployees = () => {
         },
         orderBy: {
             createdAt: "desc"
+        },
+        include: {
+            _count: {
+                select: { tasks: true }
+            }
         }
     })
 }
@@ -49,4 +54,26 @@ export const deleteUser = (id) => {
     return prisma.user.delete({
         where: { id }
     })
+}
+
+export const getDashboardStats = async () => {
+    const totalEmployees = await prisma.user.count({
+        where: {
+            role: "EMPLOYEE"
+        }
+    })
+
+    const totalTasks = await prisma.task.count();
+
+    const pendingTasks = await prisma.task.count({
+        where: {
+            status: "PENDING"
+        }
+    })
+
+    return {
+        totalEmployees,
+        totalTasks,
+        pendingTasks
+    }
 }

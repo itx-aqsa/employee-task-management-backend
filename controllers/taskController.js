@@ -54,7 +54,7 @@ export const findAllTasks = async (req, res) => {
 
 export const editTask = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         const existingTask = await getTask(id);
         if (!existingTask) {
@@ -64,11 +64,7 @@ export const editTask = async (req, res) => {
             });
         }
 
-        const validatedData = updateTaskSchema.parse({
-            ...req.body, 
-            userId: req.body.userId ? Number(req.body.userId) : undefined
-        })
-
+        const validatedData = updateTaskSchema.parse(req.body);
         if(validatedData.userId) {
             const employee = await getUser(validatedData.userId);
 
@@ -103,8 +99,7 @@ export const editTask = async (req, res) => {
 
 export const removeTask = async (req, res) => {
     try {
-        const id = Number(req.params.id);
-
+        const id = req.params.id;
         const existingTask = await getTask(id);
         if (!existingTask) {
             return res.status(404).json({
@@ -128,7 +123,7 @@ export const removeTask = async (req, res) => {
 
 export const findOneTask = async (req, res) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
 
         const task = await getTask(id);
         if (!task) {
@@ -166,7 +161,7 @@ export const findMyTasks = async(req, res) => {
 
 export const changeTaskStatus = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
         const task = await getTask(id);
         if(!task) {
             return res.status(404).json({
