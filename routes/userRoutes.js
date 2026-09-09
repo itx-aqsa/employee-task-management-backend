@@ -1,4 +1,5 @@
 import express from "express";
+
 import { createUser, loginUser, getEmployees, getEmployeeById, editUser, removeUser, getProfile, dashboardStats, logoutUser } from "../controllers/userController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { roleMiddleware } from "../middleware/roleMiddleware.js";
@@ -10,6 +11,8 @@ router.post("/login", loginUser);
 router.post("/logout", authMiddleware, logoutUser);
 router.get("/employees", authMiddleware, roleMiddleware("ADMIN"), getEmployees);
 router.get("/profile", authMiddleware, getProfile);
+router.get("/dashboard-stats", authMiddleware, roleMiddleware("ADMIN"), dashboardStats);
+router.get("/:id", authMiddleware, roleMiddleware("ADMIN"), getOneEmployee)
 
 router.get(
     "/admin-dashboard", authMiddleware, 
